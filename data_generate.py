@@ -1,9 +1,17 @@
+import os
+if 'data' not in os.listdir():
+    os.mkdir('data')
+os.chdir('data')
+if 'train' not in os.listdir():
+    os.mkdir('train')
+os.chdir('../')
+
 import pandas as pd
 import numpy as np
 import random
 
 N_features = 20
-store_path = 'data/'
+store_path = 'data/train/'
 
 def insert_random_feature(df,c_name,shift,scale):
     '''
@@ -40,5 +48,5 @@ if __name__=='__main__':
             insert_random_feature(b,'feature_%d'%i,random.randint(-100,100),random.randint(1,100))
         
         label = get_label(0.99)
-        b.to_csv(store_path+"train_%d_%d"%(r,label),index=False)
+        b.to_csv(store_path+"train_%d_%d.csv"%(r,label),index=False)
         print(b)
