@@ -11,6 +11,7 @@ import numpy as np
 import random
 
 N_features = 20
+N_batch = 1000
 store_path = 'data/train/'
 
 def insert_random_feature(df,c_name,shift,scale):
@@ -27,26 +28,34 @@ def insert_random_feature(df,c_name,shift,scale):
     inlist += shift
 
     df[c_name] = inlist
-def get_label(p):
+def get_label(feature_list):
     '''
-    按照给定概率 返回 p:1 1-p:-1
+    按照某策略，根据特征值生成label，加入一定随机性
+    :parm feature_list: 特征列表，其中每一项为某高斯分布的（均值，方差）
     '''
 
-    a = np.random.randint(low=0,high=1000)
-    if a>1000*p:
-        return -1
-    else:
+    for i in range(1,len(feature_list)):
+        feature_list[0] += feature_list[i]
+    
+    pan = (feature_list[0][0] + feature_list[0][1])/len(feature_list)
+    if  pan >= 7:
         return 1
+    else:
+        return -1
     
 
 if __name__=='__main__':
-    for r in range(1000):
-        a = pd.bdate_range(start='20201108',end='20201110',freq='1min')
-        b = pd.DataFrame(a,columns=['time'])
+    for r in range(N_batch):
+        dfa = pd.bdate_range(start='20201108',end='20201110',freq='1min')
+        dfb = pd.DataFrame(dfa,columns=['time'])
+
+        feature_list = list()
 
         for i in range(N_features-1):
-            insert_random_feature(b,'feature_%d'%i,random.randint(-100,100),random.randint(1,100))
+            a,b = random.randint(-100,100),random.randint(1,100)
+            insert_random_feature(dfb,'feature_%d'%i,a,b)
+            feature_list.append([a,b])
         
-        label = get_label(0.99)
-        b.to_csv(store_path+"train_%d_%d.csv"%(r,label),index=False)
-        print(b)
+        label = get_label(feature_list)
+        dfb.to_csv(store_path+"train_%d_%d.csv"%(r,label),index=False)
+        print(r)
