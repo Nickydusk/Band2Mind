@@ -23,7 +23,7 @@ class DecisionTree(object):
             newEnt = 0
             IV = 0
             for value in values:
-                subDataset = X[:, X[:, i]==value]
+                subDataset = X[X[:, i]==value]
                 prop = subDataset.shape[0] / X.shape[0]
                 newEnt += prop * self.calcEnt(subDataset)
                 IV = IV - prop*log2(prop)
@@ -38,20 +38,26 @@ class DecisionTree(object):
 
     def CART_createTree(self, X, attrs, node):
         tmp = X[:, attrs]
-        if len(np.unique(X[:, -1])) == (1,):
+        allSame = True
+        for i in range(tmp.shape[1]-1):
+            if len(np.unique(tmp[:, i]))!=1:
+                allSame = False
+                break
+
+        if np.unique(X[:, -1]).shape == (1,):
             node.toLeaf(X[0, -1])
-        elif sum(attrs) <= 1 or (np.unique(X[:, :-1][:, attrs[:-1]], axis=0)).shape[0]==1:
+        elif sum(attrs) <= 1 or allSame:
             node.toLeaf(self.majorityCount(X))
         else:
             bestFeature = self.CART_chooseBestFeatureToSplit(X, attrs)
             node.feature = bestFeature
             values = set(X[:, bestFeature])
             for value in values:
-                X_v = X[:, X[:, bestFeature]==value]
+                X_v = X[X[:, bestFeature]==value]
                 attrs_v = copy.deepcopy(attrs)
                 attrs_v[bestFeature] = False
                 newNode = TreeNode()
-                node.children[value] = newNode
+                node.childrens[value] = newNode
                 self.CART_createTree(X_v, attrs_v, newNode)
 
     def calcEnt(self, X):
@@ -59,7 +65,7 @@ class DecisionTree(object):
         values = set(X[:, -1])
         Ent = 0
         for value in values:
-            num = X[:, X[:, -1] == value].shape[0]
+            num = X[X[:, -1] == value].shape[0]
             Ent -= (num/tot)*log2(num/tot)
         return Ent
 
@@ -87,7 +93,7 @@ class DecisionTree(object):
         return next.label
 
     def predict_batch(self, X):
-        return np.asarray(map(lambda x:self.predict_sample(x), X))
+        return np.asarray(list(map(lambda x:self.predict_sample(x), X)))
 
 
 
@@ -101,3 +107,10 @@ class TreeNode(object):
     def toLeaf(self, label):
         self.isLeaf = True
         self.label = label
+
+if __name__ == "__main__":
+    data = pd.read_excel("./data.xslx").values[:, 1:]
+    agent = DecisionTree()
+    agent.train(data)
+    res = agent.predict_batch(data)
+    print(res)
