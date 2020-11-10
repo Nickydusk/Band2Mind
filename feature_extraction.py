@@ -83,14 +83,14 @@ def show_pca(df):
 
 
 if __name__=='__main__':
-    # df = make_header()
-    # for filename in os.listdir(source_path):
-    #     print(filename)
-    #     seri = file2FeatureVector(source_path+filename)
-    #     df = df.append(seri,ignore_index=True)
+    df = make_header()
+    for filename in os.listdir(source_path):
+        print(filename)
+        seri = file2FeatureVector(source_path+filename)
+        df = df.append(seri,ignore_index=True)
 
-    # df = df_process(df)
-    # df.to_csv(store_path,index=False)
+    df = df_process(df)
+    df.to_csv(store_path,index=False)
 
     df = pd.read_csv(store_path)
     show_pca(df)
