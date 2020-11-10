@@ -38,10 +38,15 @@ def get_label(feature_list):
         feature_list[0] += feature_list[i]
     
     pan = (feature_list[0][0] + feature_list[0][1])/len(feature_list)
-    if  pan >= 7:
-        return 1
+    if  pan + random.randint(0,1) >= 7.5:
+        ret =  1
     else:
-        return -1
+        ret = -1
+    
+    if random.randint(1,100) <= 5:
+        ret *= -1
+    
+    return ret
     
 
 if __name__=='__main__':

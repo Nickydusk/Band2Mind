@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import sklearn
+from sklearn.metrics import accuracy_score
 import copy
 from math import log2
 
@@ -109,8 +109,10 @@ class TreeNode(object):
         self.label = label
 
 if __name__ == "__main__":
-    data = pd.read_excel("./data.xslx").values[:, 1:]
+    # data = pd.read_excel("./data.xslx").values[:, 1:]
+    data = pd.read_csv("./data/features.csv").values
     agent = DecisionTree()
     agent.train(data)
-    res = agent.predict_batch(data)
-    print(res)
+    y_pred = agent.predict_batch(data)
+    y_true = data[:,-1]
+    print("accuracy:",accuracy_score(y_pred,y_true))
