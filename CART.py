@@ -38,12 +38,7 @@ class DecisionTree(object):
 
     def CART_createTree(self, X, attrs, node):
         tmp = X[:, attrs]
-        allSame = True
-        for i in range(tmp.shape[1]-1):
-            if len(np.unique(tmp[:, i]))!=1:
-                allSame = False
-                break
-
+        allSame = all(len(np.unique(tmp[:, i])) == 1 for i in range(tmp.shape[1]-1))
         if np.unique(X[:, -1]).shape == (1,):
             node.toLeaf(X[0, -1])
         elif sum(attrs) <= 1 or allSame:
@@ -81,7 +76,7 @@ class DecisionTree(object):
         return sortedPairs[0][1]
 
     def train(self, X):
-        attrs = [True for i in range(X.shape[1])]
+        attrs = [True for _ in range(X.shape[1])]
         self.root = TreeNode()
         self.CART_createTree(X, attrs, self.root)
 

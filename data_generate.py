@@ -36,16 +36,12 @@ def get_label(feature_list):
 
     for i in range(1,len(feature_list)):
         feature_list[0] += feature_list[i]
-    
+
     pan = (feature_list[0][0] + feature_list[0][1])/len(feature_list)
-    if  pan + random.randint(0,1) >= 7.5:
-        ret =  1
-    else:
-        ret = -1
-    
+    ret = 1 if pan + random.randint(0,1) >= 7.5 else -1
     if random.randint(1,100) <= 5:
         ret *= -1
-    
+
     return ret
     
 
@@ -54,13 +50,13 @@ if __name__=='__main__':
         dfa = pd.bdate_range(start='20201108',end='20201110',freq='1min')
         dfb = pd.DataFrame(dfa,columns=['time'])
 
-        feature_list = list()
+        feature_list = []
 
         for i in range(N_features-1):
             a,b = random.randint(-100,100),random.randint(1,100)
             insert_random_feature(dfb,'feature_%d'%i,a,b)
             feature_list.append([a,b])
-        
+
         label = get_label(feature_list)
         dfb.to_csv(store_path+"train_%d_%d.csv"%(r,label),index=False)
         print(r)
